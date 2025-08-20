@@ -1,75 +1,139 @@
-# Clean Architecture + DDD Structure
+﻿# Clean Architecture + DDD Structure
 
-Cáº¥u trÃºc thÆ° má»¥c nÃ y Ä‘Æ°á»£c tá»• chá»©c theo nguyÃªn táº¯c Clean Architecture vÃ  Domain-Driven Design (DDD):
+Cấu trúc thư mục này được tổ chức theo nguyên tắc Clean Architecture và Domain-Driven Design (DDD):
 
-## ðŸ“ Cáº¥u trÃºc thÆ° má»¥c
+## 📁 Cấu trúc thư mục
 
 ```
 src/
-â”œâ”€â”€ common/                 # Shared utilities vÃ  helpers
-â”‚   â”œâ”€â”€ decorators/        # Custom decorators
-â”‚   â”œâ”€â”€ guards/           # Authentication vÃ  authorization guards
-â”‚   â”œâ”€â”€ interceptors/     # Request/Response interceptors
-â”‚   â”œâ”€â”€ filters/          # Exception filters
-â”‚   â”œâ”€â”€ pipes/            # Validation pipes
-â”‚   â”œâ”€â”€ constants/        # Application constants
-â”‚   â””â”€â”€ utils/            # Utility functions
-â”œâ”€â”€ domain/                # Domain Layer (Business Rules)
-â”‚   â”œâ”€â”€ entities/         # Domain entities
-â”‚   â”œâ”€â”€ value-objects/    # Value objects
-â”‚   â”œâ”€â”€ repositories/     # Repository interfaces
-â”‚   â”œâ”€â”€ services/         # Domain services
-â”‚   â””â”€â”€ events/           # Domain events
-â”œâ”€â”€ application/           # Application Layer (Use Cases)
-â”‚   â”œâ”€â”€ use-cases/        # Application use cases
-â”‚   â”œâ”€â”€ dtos/             # Data transfer objects
-â”‚   â”œâ”€â”€ interfaces/       # Application interfaces
-â”‚   â””â”€â”€ services/         # Application services
-â”œâ”€â”€ infrastructure/        # Infrastructure Layer (External Concerns)
-â”‚   â”œâ”€â”€ database/         # Database configuration vÃ  models
-â”‚   â”œâ”€â”€ repositories/     # Repository implementations
-â”‚   â”œâ”€â”€ external-services/# External API clients
-â”‚   â””â”€â”€ config/           # Configuration files
-â”œâ”€â”€ presentation/          # Presentation Layer (Controllers)
-â”‚   â”œâ”€â”€ controllers/      # HTTP controllers
-â”‚   â”œâ”€â”€ middlewares/      # Express middlewares
-â”‚   â””â”€â”€ dto/              # Request/Response DTOs
-â””â”€â”€ main.ts               # Application entry point
+├── common/                 # Shared utilities và helpers
+│   ├── decorators/        # Custom decorators
+│   ├── guards/           # Authentication và authorization guards
+│   ├── interceptors/     # Request/Response interceptors
+│   ├── filters/          # Exception filters
+│   ├── pipes/            # Validation pipes
+│   ├── constants/        # Application constants
+│   └── utils/            # Utility functions
+├── domain/                # Domain Layer (Business Rules)
+│   ├── entities/         # Domain entities
+│   ├── value-objects/    # Value objects
+│   ├── repositories/     # Repository interfaces
+│   ├── services/         # Domain services
+│   └── events/           # Domain events
+├── application/           # Application Layer (Use Cases)
+│   ├── use-cases/        # Application use cases
+│   ├── dtos/             # Data transfer objects
+│   ├── interfaces/       # Application interfaces
+│   └── services/         # Application services
+├── infrastructure/        # Infrastructure Layer (External Concerns)
+│   ├── database/         # Database configuration và models
+│   ├── repositories/     # Repository implementations
+│   ├── external-services/# External API clients
+│   └── config/           # Configuration files
+├── presentation/          # Presentation Layer (Controllers)
+│   ├── controllers/      # HTTP controllers
+│   ├── middlewares/      # Express middlewares
+│   └── dto/              # Request/Response DTOs
+└── main.ts               # Application entry point
 ```
 
-## ðŸ—ï¸ NguyÃªn táº¯c Clean Architecture
+## 🏗️ Nguyên tắc Clean Architecture
 
 ### 1. **Domain Layer** (Innermost)
-- Chá»©a business logic core
-- KhÃ´ng phá»¥ thuá»™c vÃ o layer nÃ o khÃ¡c
-- Äá»‹nh nghÄ©a entities, value objects, domain services
+- Chứa business logic core
+- Không phụ thuộc vào layer nào khác
+- Định nghĩa entities, value objects, domain services
 
 ### 2. **Application Layer**
-- Chá»©a use cases vÃ  application logic
-- Phá»¥ thuá»™c vÃ o Domain layer
-- Orchestrates domain objects Ä‘á»ƒ thá»±c hiá»‡n business workflows
+- Chứa use cases và application logic
+- Phụ thuộc vào Domain layer
+- Orchestrates domain objects để thực hiện business workflows
 
 ### 3. **Infrastructure Layer**
-- Implements interfaces tá»« Domain vÃ  Application layers
-- Chá»©a database, external services, frameworks
+- Implements interfaces từ Domain và Application layers
+- Chứa database, external services, frameworks
 
 ### 4. **Presentation Layer** (Outermost)
 - Handles HTTP requests/responses
-- Phá»¥ thuá»™c vÃ o Application layer
+- Phụ thuộc vào Application layer
 - Controllers, middlewares, DTOs
 
-## ðŸŽ¯ Lá»£i Ã­ch
+## 🎯 Lợi ích
 
-- **Separation of Concerns**: Má»—i layer cÃ³ trÃ¡ch nhiá»‡m riÃªng biá»‡t
-- **Testability**: Dá»… dÃ ng unit test tá»«ng layer
-- **Maintainability**: Code dá»… maintain vÃ  extend
-- **Independence**: Domain logic khÃ´ng phá»¥ thuá»™c vÃ o frameworks
-- **Flexibility**: Dá»… dÃ ng thay Ä‘á»•i database hoáº·c external services
+- **Separation of Concerns**: Mỗi layer có trách nhiệm riêng biệt
+- **Testability**: Dễ dàng unit test từng layer
+- **Maintainability**: Code dễ maintain và extend
+- **Independence**: Domain logic không phụ thuộc vào frameworks
+- **Flexibility**: Dễ dàng thay đổi database hoặc external services
 
-## ðŸ“ VÃ­ dá»¥ Flow
+## 🔄 Ví dụ Flow
 
-1. **Request** â†’ Presentation Layer (Controller)
-2. **Controller** â†’ Application Layer (Use Case)
-3. **Use Case** â†’ Domain Layer (Entity/Service)
-4. **Domain** â†’ Infrastructure Layer (Repository)
-5. **Response** â† Tráº£ vá» qua cÃ¡c layers
+1. **Request** → Presentation Layer (Controller)
+2. **Controller** → Application Layer (Use Case)
+3. **Use Case** → Domain Layer (Entity/Service)
+4. **Domain** → Infrastructure Layer (Repository)
+5. **Response** ← Trả về qua các layers
+
+## 📋 Dependency Rules
+
+`mermaid
+graph TD
+    A[Presentation Layer] --> B[Application Layer]
+    B --> C[Domain Layer]
+    A --> D[Infrastructure Layer]
+    B --> D
+    D --> C
+`
+
+- Các layer bên ngoài có thể phụ thuộc vào các layer bên trong
+- Các layer bên trong KHÔNG được phụ thuộc vào các layer bên ngoài
+- Domain Layer là independent nhất, không phụ thuộc vào ai
+
+## 🧩 DDD Patterns được sử dụng
+
+### Entities
+- Có identity duy nhất
+- Có business logic
+- Có thể thay đổi state qua thời gian
+
+### Value Objects
+- Immutable objects
+- Định nghĩa bằng attributes của chúng
+- Không có identity
+
+### Repositories
+- Interface cho data access
+- Encapsulate database operations
+- Defined trong Domain, implemented trong Infrastructure
+
+### Use Cases
+- Represent application-specific business rules
+- Orchestrate entities và repositories
+- Input/Output boundaries rõ ràng
+
+### Domain Services
+- Business logic không thuộc về entity nào cụ thể
+- Stateless operations
+- Domain-specific algorithms
+
+## 💡 Best Practices
+
+1. **Dependency Inversion**: Use interfaces, inject dependencies
+2. **Single Responsibility**: Mỗi class có một lý do để thay đổi
+3. **Open/Closed**: Open for extension, closed for modification
+4. **Interface Segregation**: Clients không phụ thuộc vào interfaces không dùng
+5. **Liskov Substitution**: Objects có thể thay thế bằng instances của subtypes
+
+## 🔧 NestJS Integration
+
+- **Modules**: Organize features theo DDD bounded contexts
+- **Providers**: Implement repositories và services
+- **Controllers**: Presentation layer endpoints
+- **Guards/Interceptors**: Cross-cutting concerns
+- **DTOs**: Data transfer objects cho API
+
+## 📚 Tài liệu tham khảo
+
+- [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [Domain-Driven Design - Eric Evans](https://domainlanguage.com/ddd/)
+- [NestJS Documentation](https://docs.nestjs.com/)
