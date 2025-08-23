@@ -1,6 +1,7 @@
 # 🧩 Common Layer
 
 ## 📝 Mục đích
+
 Common Layer chứa **shared utilities**, **cross-cutting concerns** và **reusable components** được sử dụng bởi tất cả các layers khác. Layer này giúp tránh code duplication và tạo consistency across the application.
 
 ## 📂 Cấu trúc thư mục
@@ -20,6 +21,7 @@ common/
 ## 🎯 Nguyên tắc
 
 ### ✅ Common Layer được phép:
+
 - Chứa reusable utilities và helpers
 - Define constants và enums
 - Create custom decorators
@@ -28,6 +30,7 @@ common/
 - Cross-cutting concerns (logging, caching, etc.)
 
 ### ❌ Common Layer KHÔNG được phép:
+
 - Chứa business logic specific
 - Depend on specific domains
 - Include framework-specific implementations
@@ -36,6 +39,7 @@ common/
 ## 📋 Code Convention
 
 ### Decorators
+
 ```typescript
 // ✅ Good: Reusable custom decorators
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
@@ -88,6 +92,7 @@ async getData() {
 ```
 
 ### Constants
+
 ```typescript
 // ✅ Good: Well-organized constants
 export const API_CONSTANTS = {
@@ -159,6 +164,7 @@ export enum PaymentStatus {
 ```
 
 ### Utils
+
 ```typescript
 // ✅ Good: Reusable utility functions
 import { v4 as uuidv4 } from 'uuid';
@@ -188,7 +194,8 @@ export class StringUtils {
   }
 
   static generateRandomString(length: number): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
     for (let i = 0; i < length; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -202,7 +209,7 @@ export class DateUtils {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    
+
     return format
       .replace('YYYY', year.toString())
       .replace('MM', month)
@@ -232,7 +239,8 @@ export class ValidationUtils {
   }
 
   static isValidUUID(uuid: string): boolean {
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(uuid);
   }
 
@@ -243,16 +251,24 @@ export class ValidationUtils {
 
   static validatePassword(password: string): void {
     if (password.length < 8) {
-      throw new BadRequestException('Password must be at least 8 characters long');
+      throw new BadRequestException(
+        'Password must be at least 8 characters long',
+      );
     }
     if (!/(?=.*[a-z])/.test(password)) {
-      throw new BadRequestException('Password must contain at least one lowercase letter');
+      throw new BadRequestException(
+        'Password must contain at least one lowercase letter',
+      );
     }
     if (!/(?=.*[A-Z])/.test(password)) {
-      throw new BadRequestException('Password must contain at least one uppercase letter');
+      throw new BadRequestException(
+        'Password must contain at least one uppercase letter',
+      );
     }
     if (!/(?=.*\d)/.test(password)) {
-      throw new BadRequestException('Password must contain at least one number');
+      throw new BadRequestException(
+        'Password must contain at least one number',
+      );
     }
   }
 }
@@ -267,7 +283,10 @@ export class CryptoUtils {
     return bcrypt.hash(password, saltRounds);
   }
 
-  static async comparePassword(password: string, hash: string): Promise<boolean> {
+  static async comparePassword(
+    password: string,
+    hash: string,
+  ): Promise<boolean> {
     return bcrypt.compare(password, hash);
   }
 
@@ -293,20 +312,29 @@ export class ArrayUtils {
     array: T[],
     key: (item: T) => K,
   ): Record<K, T[]> {
-    return array.reduce((groups, item) => {
-      const group = key(item);
-      groups[group] = groups[group] || [];
-      groups[group].push(item);
-      return groups;
-    }, {} as Record<K, T[]>);
+    return array.reduce(
+      (groups, item) => {
+        const group = key(item);
+        groups[group] = groups[group] || [];
+        groups[group].push(item);
+        return groups;
+      },
+      {} as Record<K, T[]>,
+    );
   }
 }
 ```
 
 ### Pipes
+
 ```typescript
 // ✅ Good: Reusable validation pipes
-import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+import {
+  PipeTransform,
+  Injectable,
+  ArgumentMetadata,
+  BadRequestException,
+} from '@nestjs/common';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
@@ -324,7 +352,9 @@ export class ValidationPipe implements PipeTransform<any> {
       const messages = errors.map(error => {
         return Object.values(error.constraints || {}).join(', ');
       });
-      throw new BadRequestException(`Validation failed: ${messages.join('; ')}`);
+      throw new BadRequestException(
+        `Validation failed: ${messages.join('; ')}`,
+      );
     }
 
     return object;
@@ -374,14 +404,15 @@ export class OptionalParsePipe implements PipeTransform {
 ```
 
 ### Interceptors
+
 ```typescript
 // ✅ Good: Shared interceptors
-import { 
-  Injectable, 
-  NestInterceptor, 
-  ExecutionContext, 
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
   CallHandler,
-  Logger 
+  Logger,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
@@ -397,12 +428,16 @@ export class LoggingInterceptor implements NestInterceptor {
     const now = Date.now();
 
     this.logger.log(`Incoming Request: ${method} ${url}`);
-    this.logger.debug(`Request Details: ${JSON.stringify({ body, params, query })}`);
+    this.logger.debug(
+      `Request Details: ${JSON.stringify({ body, params, query })}`,
+    );
 
     return next.handle().pipe(
       tap(() => {
         const responseTime = Date.now() - now;
-        this.logger.log(`Request Completed: ${method} ${url} - ${responseTime}ms`);
+        this.logger.log(
+          `Request Completed: ${method} ${url} - ${responseTime}ms`,
+        );
       }),
     );
   }
@@ -428,10 +463,13 @@ export class TransformInterceptor<T> implements NestInterceptor<T, any> {
 export class CacheInterceptor implements NestInterceptor {
   constructor(private readonly cacheService: CacheService) {}
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
+  async intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
     const cacheKey = this.generateCacheKey(request);
-    
+
     // Only cache GET requests
     if (request.method !== 'GET') {
       return next.handle();
@@ -466,15 +504,16 @@ export class CacheInterceptor implements NestInterceptor {
 ```
 
 ### Filters
+
 ```typescript
 // ✅ Good: Shared exception filters
-import { 
-  ExceptionFilter, 
-  Catch, 
-  ArgumentsHost, 
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger 
+  Logger,
 } from '@nestjs/common';
 
 @Catch()
@@ -492,9 +531,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const responseBody = exception.getResponse();
-      message = typeof responseBody === 'string' 
-        ? responseBody 
-        : (responseBody as any).message;
+      message =
+        typeof responseBody === 'string'
+          ? responseBody
+          : (responseBody as any).message;
     }
 
     const errorResponse = {
@@ -525,13 +565,13 @@ export class ValidationExceptionFilter implements ExceptionFilter {
 
     if (status === HttpStatus.BAD_REQUEST) {
       const responseBody = exception.getResponse() as any;
-      
+
       response.status(status).json({
         success: false,
         statusCode: status,
         message: 'Validation failed',
-        errors: Array.isArray(responseBody.message) 
-          ? responseBody.message 
+        errors: Array.isArray(responseBody.message)
+          ? responseBody.message
           : [responseBody.message],
         timestamp: new Date().toISOString(),
       });
@@ -562,8 +602,12 @@ describe('StringUtils', () => {
   describe('slugify', () => {
     it('should convert text to slug', () => {
       expect(StringUtils.slugify('Hello World')).toBe('hello-world');
-      expect(StringUtils.slugify('Special!@#$%Characters')).toBe('specialcharacters');
-      expect(StringUtils.slugify('  Multiple   Spaces  ')).toBe('multiple-spaces');
+      expect(StringUtils.slugify('Special!@#$%Characters')).toBe(
+        'specialcharacters',
+      );
+      expect(StringUtils.slugify('  Multiple   Spaces  ')).toBe(
+        'multiple-spaces',
+      );
     });
   });
 

@@ -1,6 +1,7 @@
 # 🔄 Application Layer
 
 ## 📝 Mục đích
+
 Application Layer chứa **application logic** và **use cases**. Layer này orchestrate domain objects để thực hiện business workflows và xử lý application-specific logic.
 
 ## 📂 Cấu trúc thư mục
@@ -17,6 +18,7 @@ application/
 ## 🎯 Nguyên tắc
 
 ### ✅ Application Layer được phép:
+
 - Orchestrate domain objects
 - Implement use cases và workflows
 - Define application-specific DTOs
@@ -25,6 +27,7 @@ application/
 - Manage transactions
 
 ### ❌ Application Layer KHÔNG được phép:
+
 - Chứa business rules (thuộc Domain layer)
 - Direct database access (sử dụng repository interfaces)
 - HTTP request/response handling (thuộc Presentation layer)
@@ -33,6 +36,7 @@ application/
 ## 📋 Code Convention
 
 ### Use Cases
+
 ```typescript
 // ✅ Good: Clear use case with single responsibility
 export interface UseCase<TRequest, TResponse> {
@@ -40,7 +44,9 @@ export interface UseCase<TRequest, TResponse> {
 }
 
 @Injectable()
-export class CreateUserUseCase implements UseCase<CreateUserRequest, CreateUserResponse> {
+export class CreateUserUseCase
+  implements UseCase<CreateUserRequest, CreateUserResponse>
+{
   constructor(
     private readonly userRepository: UserRepository,
     private readonly emailService: EmailService,
@@ -109,7 +115,7 @@ export class UserService {
 
     // Bad: Direct database access
     const result = await this.database.query('INSERT INTO users...');
-    
+
     // Bad: HTTP response logic in application layer
     return { status: 'success', data: result };
   }
@@ -117,6 +123,7 @@ export class UserService {
 ```
 
 ### DTOs (Data Transfer Objects)
+
 ```typescript
 // ✅ Good: Input/Output DTOs với validation
 export class CreateUserRequest {
@@ -180,6 +187,7 @@ export class CreateUserDto {
 ```
 
 ### Application Services
+
 ```typescript
 // ✅ Good: Application service coordinating multiple use cases
 @Injectable()
@@ -210,9 +218,13 @@ export class UserApplicationService {
 
   // Complex workflow involving multiple use cases
   async transferUserData(fromUserId: string, toUserId: string): Promise<void> {
-    const fromUser = await this.getUserUseCase.execute(new GetUserRequest(fromUserId));
-    const toUser = await this.getUserUseCase.execute(new GetUserRequest(toUserId));
-    
+    const fromUser = await this.getUserUseCase.execute(
+      new GetUserRequest(fromUserId),
+    );
+    const toUser = await this.getUserUseCase.execute(
+      new GetUserRequest(toUserId),
+    );
+
     // Coordinate multiple operations
     // Implementation here...
   }
@@ -220,12 +232,17 @@ export class UserApplicationService {
 ```
 
 ### Interfaces
+
 ```typescript
 // ✅ Good: Application interfaces for external dependencies
 export interface EmailService {
   sendWelcomeEmail(email: string, name: string): Promise<void>;
   sendPasswordResetEmail(email: string, resetToken: string): Promise<void>;
-  sendNotificationEmail(email: string, subject: string, content: string): Promise<void>;
+  sendNotificationEmail(
+    email: string,
+    subject: string,
+    content: string,
+  ): Promise<void>;
 }
 
 export interface FileStorageService {
@@ -252,9 +269,12 @@ export interface UserQueryService {
 ## 🔄 Workflow Examples
 
 ### 1. Simple CRUD Use Case
+
 ```typescript
 @Injectable()
-export class GetUserUseCase implements UseCase<GetUserRequest, GetUserResponse> {
+export class GetUserUseCase
+  implements UseCase<GetUserRequest, GetUserResponse>
+{
   constructor(
     private readonly userRepository: UserRepository,
     private readonly logger: Logger,
@@ -274,9 +294,12 @@ export class GetUserUseCase implements UseCase<GetUserRequest, GetUserResponse> 
 ```
 
 ### 2. Complex Business Workflow
+
 ```typescript
 @Injectable()
-export class ProcessOrderUseCase implements UseCase<ProcessOrderRequest, ProcessOrderResponse> {
+export class ProcessOrderUseCase
+  implements UseCase<ProcessOrderRequest, ProcessOrderResponse>
+{
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly userRepository: UserRepository,
@@ -316,14 +339,23 @@ export class ProcessOrderUseCase implements UseCase<ProcessOrderRequest, Process
     // 7. Publish domain events
     order.domainEvents.forEach(event => this.eventBus.publish(event));
 
-    return new ProcessOrderResponse(order.id, order.status, paymentResult.transactionId);
+    return new ProcessOrderResponse(
+      order.id,
+      order.status,
+      paymentResult.transactionId,
+    );
   }
 
   private async checkInventoryAvailability(order: Order): Promise<void> {
     for (const item of order.items) {
-      const available = await this.inventoryService.checkAvailability(item.productId, item.quantity);
+      const available = await this.inventoryService.checkAvailability(
+        item.productId,
+        item.quantity,
+      );
       if (!available) {
-        throw new Error(`Insufficient inventory for product: ${item.productId}`);
+        throw new Error(
+          `Insufficient inventory for product: ${item.productId}`,
+        );
       }
     }
   }
@@ -331,20 +363,26 @@ export class ProcessOrderUseCase implements UseCase<ProcessOrderRequest, Process
 ```
 
 ### 3. Query Use Case với Caching
+
 ```typescript
 @Injectable()
-export class GetUserProfileUseCase implements UseCase<GetUserProfileRequest, GetUserProfileResponse> {
+export class GetUserProfileUseCase
+  implements UseCase<GetUserProfileRequest, GetUserProfileResponse>
+{
   constructor(
     private readonly userRepository: UserRepository,
     private readonly cacheService: CacheService,
     private readonly logger: Logger,
   ) {}
 
-  async execute(request: GetUserProfileRequest): Promise<GetUserProfileResponse> {
+  async execute(
+    request: GetUserProfileRequest,
+  ): Promise<GetUserProfileResponse> {
     const cacheKey = `user_profile_${request.userId}`;
 
     // Try cache first
-    const cached = await this.cacheService.get<GetUserProfileResponse>(cacheKey);
+    const cached =
+      await this.cacheService.get<GetUserProfileResponse>(cacheKey);
     if (cached) {
       this.logger.log(`User profile served from cache: ${request.userId}`);
       return cached;
@@ -424,7 +462,9 @@ describe('CreateUserUseCase', () => {
     const request = new CreateUserRequest('test@example.com', 'John', 'Doe');
 
     // Act & Assert
-    await expect(useCase.execute(request)).rejects.toThrow('User already exists');
+    await expect(useCase.execute(request)).rejects.toThrow(
+      'User already exists',
+    );
   });
 });
 ```

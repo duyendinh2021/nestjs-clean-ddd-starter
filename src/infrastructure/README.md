@@ -1,6 +1,7 @@
 # 🔧 Infrastructure Layer
 
 ## 📝 Mục đích
+
 Infrastructure Layer chứa **technical details** và **external concerns**. Layer này implement các interfaces được định nghĩa trong Domain và Application layers, cung cấp concrete implementations cho database, external services, frameworks.
 
 ## 📂 Cấu trúc thư mục
@@ -17,6 +18,7 @@ infrastructure/
 ## 🎯 Nguyên tắc
 
 ### ✅ Infrastructure Layer được phép:
+
 - Implement repository interfaces từ Domain layer
 - Implement service interfaces từ Application layer
 - Access databases, file systems, external APIs
@@ -25,6 +27,7 @@ infrastructure/
 - Implement caching, messaging, logging
 
 ### ❌ Infrastructure Layer KHÔNG được phép:
+
 - Chứa business logic (thuộc Domain layer)
 - Chứa application workflows (thuộc Application layer)
 - Expose implementation details ra ngoài
@@ -33,6 +36,7 @@ infrastructure/
 ## 📋 Code Convention
 
 ### Repository Implementations
+
 ```typescript
 // ✅ Good: Clean repository implementation
 @Injectable()
@@ -116,6 +120,7 @@ export class BadUserRepository implements UserRepository {
 ```
 
 ### Database Entities (ORM Models)
+
 ```typescript
 // ✅ Good: Clean database entity
 @Entity('users')
@@ -183,6 +188,7 @@ export class BadUserEntity {
 ```
 
 ### Mappers (Domain ↔ Infrastructure)
+
 ```typescript
 // ✅ Good: Clean mapping between domain and infrastructure
 @Injectable()
@@ -223,15 +229,14 @@ export class UserMapper {
 ```
 
 ### External Service Implementations
+
 ```typescript
 // ✅ Good: External service implementation
 @Injectable()
 export class SendGridEmailService implements EmailService {
   private readonly client: MailService;
 
-  constructor(
-    @Inject('EMAIL_CONFIG') private readonly config: EmailConfig,
-  ) {
+  constructor(@Inject('EMAIL_CONFIG') private readonly config: EmailConfig) {
     this.client = new MailService();
     this.client.setApiKey(config.apiKey);
   }
@@ -255,9 +260,12 @@ export class SendGridEmailService implements EmailService {
     }
   }
 
-  async sendPasswordResetEmail(email: string, resetToken: string): Promise<void> {
+  async sendPasswordResetEmail(
+    email: string,
+    resetToken: string,
+  ): Promise<void> {
     const resetUrl = `${this.config.frontendUrl}/reset-password?token=${resetToken}`;
-    
+
     const msg = {
       to: email,
       from: this.config.fromEmail,
@@ -276,7 +284,11 @@ export class SendGridEmailService implements EmailService {
     }
   }
 
-  async sendNotificationEmail(email: string, subject: string, content: string): Promise<void> {
+  async sendNotificationEmail(
+    email: string,
+    subject: string,
+    content: string,
+  ): Promise<void> {
     const msg = {
       to: email,
       from: this.config.fromEmail,
@@ -294,6 +306,7 @@ export class SendGridEmailService implements EmailService {
 ```
 
 ### Configuration
+
 ```typescript
 // ✅ Good: Configuration management
 export interface DatabaseConfig {
@@ -359,6 +372,7 @@ export class ConfigService {
 ```
 
 ### Caching Implementation
+
 ```typescript
 // ✅ Good: Cache service implementation
 @Injectable()
@@ -422,6 +436,7 @@ export class RedisCacheService implements CacheService {
 ## 🔄 Workflow Examples
 
 ### 1. Database Setup với TypeORM
+
 ```typescript
 // database/database.module.ts
 @Module({
@@ -447,6 +462,7 @@ export class DatabaseModule {}
 ```
 
 ### 2. Repository Module
+
 ```typescript
 // repositories/repository.module.ts
 @Module({
@@ -468,6 +484,7 @@ export class RepositoryModule {}
 ```
 
 ### 3. External Services Module
+
 ```typescript
 // external-services/external-services.module.ts
 @Module({

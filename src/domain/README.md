@@ -1,6 +1,7 @@
 # 🏛️ Domain Layer
 
 ## 📝 Mục đích
+
 Domain Layer là **lõi của ứng dụng**, chứa toàn bộ business logic và business rules. Layer này hoàn toàn độc lập và không phụ thuộc vào bất kỳ layer nào khác.
 
 ## 📂 Cấu trúc thư mục
@@ -18,6 +19,7 @@ domain/
 ## 🎯 Nguyên tắc
 
 ### ✅ Domain Layer được phép:
+
 - Định nghĩa business rules và logic
 - Chứa entities với identity và behavior
 - Tạo value objects immutable
@@ -26,6 +28,7 @@ domain/
 - Sử dụng domain services cho complex logic
 
 ### ❌ Domain Layer KHÔNG được phép:
+
 - Import từ Application, Infrastructure, hoặc Presentation layers
 - Phụ thuộc vào frameworks (NestJS, Express, etc.)
 - Trực tiếp access database hoặc external services
@@ -34,6 +37,7 @@ domain/
 ## 📋 Code Convention
 
 ### Entities
+
 ```typescript
 // ✅ Good: Rich domain model with behavior
 export class User extends BaseEntity {
@@ -73,9 +77,15 @@ export class User extends BaseEntity {
   }
 
   // Getters
-  public get email(): string { return this._email; }
-  public get fullName(): string { return `${this._firstName} ${this._lastName}`; }
-  public get isActive(): boolean { return this._isActive; }
+  public get email(): string {
+    return this._email;
+  }
+  public get fullName(): string {
+    return `${this._firstName} ${this._lastName}`;
+  }
+  public get isActive(): boolean {
+    return this._isActive;
+  }
 
   // Private validation
   private validateEmail(email: string): void {
@@ -98,6 +108,7 @@ export class User {
 ```
 
 ### Value Objects
+
 ```typescript
 // ✅ Good: Immutable value object with validation
 export class Money extends BaseValueObject {
@@ -110,8 +121,12 @@ export class Money extends BaseValueObject {
     this.validateCurrency(_currency);
   }
 
-  public get amount(): number { return this._amount; }
-  public get currency(): string { return this._currency; }
+  public get amount(): number {
+    return this._amount;
+  }
+  public get currency(): string {
+    return this._currency;
+  }
 
   public add(other: Money): Money {
     if (this._currency !== other._currency) {
@@ -144,6 +159,7 @@ export class Money extends BaseValueObject {
 ```
 
 ### Repository Interfaces
+
 ```typescript
 // ✅ Good: Focus on domain needs, not implementation
 export interface UserRepository {
@@ -152,7 +168,7 @@ export interface UserRepository {
   findActiveUsers(): Promise<User[]>;
   save(user: User): Promise<void>;
   delete(id: string): Promise<void>;
-  
+
   // Domain-specific queries
   findUsersByRole(role: string): Promise<User[]>;
   countActiveUsers(): Promise<number>;
@@ -167,13 +183,17 @@ export interface UserRepository {
 ```
 
 ### Domain Services
+
 ```typescript
 // ✅ Good: Complex business logic that doesn't belong to single entity
 @Injectable()
 export class UserDomainService {
   constructor(private readonly userRepository: UserRepository) {}
 
-  public async canUserAccess(userId: string, resourceId: string): Promise<boolean> {
+  public async canUserAccess(
+    userId: string,
+    resourceId: string,
+  ): Promise<boolean> {
     const user = await this.userRepository.findById(userId);
     if (!user || !user.isActive) {
       return false;
@@ -206,6 +226,7 @@ export class UserDomainService {
 ```
 
 ### Domain Events
+
 ```typescript
 // ✅ Good: Domain event with relevant data
 export class UserActivatedEvent implements DomainEvent {
@@ -227,6 +248,7 @@ export class UserActivatedEvent implements DomainEvent {
 ## 🔄 Workflow Example
 
 ### 1. Tạo Entity mới
+
 ```typescript
 // 1. Extend BaseEntity
 export class Order extends BaseEntity {
@@ -264,6 +286,7 @@ export class Order extends BaseEntity {
 ```
 
 ### 2. Tạo Repository Interface
+
 ```typescript
 export interface OrderRepository {
   findById(id: string): Promise<Order | null>;
@@ -275,6 +298,7 @@ export interface OrderRepository {
 ```
 
 ### 3. Sử dụng trong Domain Service
+
 ```typescript
 export class OrderDomainService {
   constructor(private readonly orderRepository: OrderRepository) {}

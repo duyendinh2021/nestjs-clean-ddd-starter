@@ -1,6 +1,7 @@
 # 🌐 Presentation Layer
 
 ## 📝 Mục đích
+
 Presentation Layer là **entry point** của ứng dụng, chịu trách nhiệm handle HTTP requests/responses, routing, validation, authentication và authorization. Layer này expose application functionality thông qua REST APIs, GraphQL, hoặc other protocols.
 
 ## 📂 Cấu trúc thư mục
@@ -16,6 +17,7 @@ presentation/
 ## 🎯 Nguyên tắc
 
 ### ✅ Presentation Layer được phép:
+
 - Handle HTTP requests và responses
 - Route requests đến appropriate use cases
 - Validate input data
@@ -24,6 +26,7 @@ presentation/
 - Handle HTTP-specific concerns (headers, status codes, etc.)
 
 ### ❌ Presentation Layer KHÔNG được phép:
+
 - Chứa business logic (thuộc Domain layer)
 - Chứa application workflows (thuộc Application layer)
 - Direct database access (sử dụng Application layer)
@@ -32,6 +35,7 @@ presentation/
 ## 📋 Code Convention
 
 ### Controllers
+
 ```typescript
 // ✅ Good: Clean controller với single responsibility
 @Controller('users')
@@ -50,7 +54,11 @@ export class UserController {
   async createUser(@Body() dto: CreateUserDto): Promise<CreateUserResponseDto> {
     try {
       // 1. Transform DTO to application request
-      const request = new CreateUserRequest(dto.email, dto.firstName, dto.lastName);
+      const request = new CreateUserRequest(
+        dto.email,
+        dto.firstName,
+        dto.lastName,
+      );
 
       // 2. Execute use case
       const response = await this.userApplicationService.createUser(request);
@@ -118,7 +126,9 @@ export class UserController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'role', required: false, type: String })
-  async getUsers(@Query() query: GetUsersQueryDto): Promise<GetUsersResponseDto> {
+  async getUsers(
+    @Query() query: GetUsersQueryDto,
+  ): Promise<GetUsersResponseDto> {
     try {
       const request = new GetUsersRequest(
         query.page || 1,
@@ -158,10 +168,14 @@ export class BadUserController {
 ```
 
 ### DTOs (Data Transfer Objects)
+
 ```typescript
 // ✅ Good: Request DTOs với validation
 export class CreateUserDto {
-  @ApiProperty({ description: 'User email address', example: 'john@example.com' })
+  @ApiProperty({
+    description: 'User email address',
+    example: 'john@example.com',
+  })
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -278,6 +292,7 @@ export class BadCreateUserDto {
 ```
 
 ### Guards (Authentication & Authorization)
+
 ```typescript
 // ✅ Good: JWT Authentication Guard
 @Injectable()
@@ -362,6 +377,7 @@ export class OwnershipGuard implements CanActivate {
 ```
 
 ### Middlewares
+
 ```typescript
 // ✅ Good: Logging middleware
 @Injectable()
@@ -391,8 +407,14 @@ export class LoggingMiddleware implements NestMiddleware {
 @Injectable()
 export class CorsMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction): void {
-    res.header('Access-Control-Allow-Origin', process.env.ALLOWED_ORIGINS || '*');
-    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.header(
+      'Access-Control-Allow-Origin',
+      process.env.ALLOWED_ORIGINS || '*',
+    );
+    res.header(
+      'Access-Control-Allow-Methods',
+      'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    );
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
@@ -419,6 +441,7 @@ export class RateLimitMiddleware implements NestMiddleware {
 ```
 
 ### Exception Filters
+
 ```typescript
 // ✅ Good: Global exception filter
 @Catch()
@@ -436,7 +459,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       const responseBody = exception.getResponse();
-      message = typeof responseBody === 'string' ? responseBody : (responseBody as any).message;
+      message =
+        typeof responseBody === 'string'
+          ? responseBody
+          : (responseBody as any).message;
     } else if (exception instanceof Error) {
       message = exception.message;
     }
@@ -477,22 +503,34 @@ export class DomainExceptionFilter implements ExceptionFilter {
 ## 🔄 Workflow Examples
 
 ### 1. Simple CRUD Controller
+
 ```typescript
 @Controller('products')
 @ApiTags('Products')
 export class ProductController {
-  constructor(private readonly productApplicationService: ProductApplicationService) {}
+  constructor(
+    private readonly productApplicationService: ProductApplicationService,
+  ) {}
 
   @Post()
-  async create(@Body() dto: CreateProductDto): Promise<CreateProductResponseDto> {
+  async create(
+    @Body() dto: CreateProductDto,
+  ): Promise<CreateProductResponseDto> {
     const request = new CreateProductRequest(dto.name, dto.price, dto.category);
-    const response = await this.productApplicationService.createProduct(request);
+    const response =
+      await this.productApplicationService.createProduct(request);
     return CreateProductResponseDto.fromApplication(response);
   }
 
   @Get()
-  async findAll(@Query() query: GetProductsQueryDto): Promise<GetProductsResponseDto> {
-    const request = new GetProductsRequest(query.page, query.limit, query.category);
+  async findAll(
+    @Query() query: GetProductsQueryDto,
+  ): Promise<GetProductsResponseDto> {
+    const request = new GetProductsRequest(
+      query.page,
+      query.limit,
+      query.category,
+    );
     const response = await this.productApplicationService.getProducts(request);
     return GetProductsResponseDto.fromApplication(response);
   }
@@ -505,7 +543,10 @@ export class ProductController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id') id: string, @Body() dto: UpdateProductDto): Promise<void> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateProductDto,
+  ): Promise<void> {
     const request = new UpdateProductRequest(dto.name, dto.price);
     await this.productApplicationService.updateProduct(id, request);
   }
@@ -520,11 +561,14 @@ export class ProductController {
 ```
 
 ### 2. File Upload Controller
+
 ```typescript
 @Controller('files')
 @ApiTags('Files')
 export class FileController {
-  constructor(private readonly fileApplicationService: FileApplicationService) {}
+  constructor(
+    private readonly fileApplicationService: FileApplicationService,
+  ) {}
 
   @Post('upload')
   @UseGuards(AuthGuard)
@@ -542,7 +586,11 @@ export class FileController {
       throw new BadRequestException('File is required');
     }
 
-    const request = new UploadFileRequest(file.buffer, file.originalname, user.id);
+    const request = new UploadFileRequest(
+      file.buffer,
+      file.originalname,
+      user.id,
+    );
     const response = await this.fileApplicationService.uploadFile(request);
     return FileUploadResponseDto.fromApplication(response);
   }
@@ -554,7 +602,7 @@ export class FileController {
     @Res() res: Response,
   ): Promise<void> {
     const file = await this.fileApplicationService.getFile(id);
-    
+
     res.set({
       'Content-Type': file.mimeType,
       'Content-Disposition': `attachment; filename="${file.originalName}"`,
@@ -615,7 +663,10 @@ describe('UserController', () => {
       dto.firstName = 'John';
       dto.lastName = 'Doe';
 
-      const expectedResponse = new CreateUserResponse('123', 'test@example.com');
+      const expectedResponse = new CreateUserResponse(
+        '123',
+        'test@example.com',
+      );
       service.createUser.mockResolvedValue(expectedResponse);
 
       // Act
